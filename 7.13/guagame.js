@@ -48,6 +48,7 @@ var GuaGame = function(fps) {
         }, 1000/window.fps)
     }
 
+    // runloop()
     setTimeout(function(){
         runloop()
     }, 1000/fps)

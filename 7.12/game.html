@@ -83,6 +83,7 @@ var GuaGame = function() {
         actions: {},
         keydowns: {},
     }
+
     var canvas = document.querySelector('#id-canvas')
     var context = canvas.getContext('2d')
     g.canvas = canvas
@@ -91,19 +92,22 @@ var GuaGame = function() {
     g.drawImage = function(guaImage) {
         g.context.drawImage(guaImage.image, guaImage.x, guaImage.y)
     }
-    // events
-    window.addEventListener('keydown', function(event){
-        g.keydowns[event.key] = true
-    })
-    window.addEventListener('keyup', function(event){
-        g.keydowns[event.key] = false
-    })
     //
     g.registerAction = function(key, callback) {
         g.actions[key] = callback
     }
-    // timer
-    setInterval(function(){
+
+    g.bindEvents = function() {
+        // events
+        window.addEventListener('keydown', function(event){
+            g.keydowns[event.key] = true
+        })
+        window.addEventListener('keyup', function(event){
+            g.keydowns[event.key] = false
+        })
+    }
+
+    g.respondEvents = function() {
         // events
         var actions = Object.keys(g.actions)
         for (var i = 0; i < actions.length; i++) {
@@ -113,19 +117,29 @@ var GuaGame = function() {
                 g.actions[key]()
             }
         }
-        // update
-        g.update()
-        // clear
-        context.clearRect(0, 0, canvas.width, canvas.height)
-        // draw
-        g.draw()
-    }, 1000/30)
+    }
 
+    g.init = function() {
+        g.bindEvents()
+        // timer
+        setInterval(function(){
+            g.respondEvents()
+
+            // update
+            g.update()
+            // clear
+            context.clearRect(0, 0, canvas.width, canvas.height)
+            // draw
+            g.draw()
+
+        }, 1000/30)
+    }
     return g
 }
 
 var __main = function() {
     var game = GuaGame()
+    game.init()
 
     var paddle = Paddle()
     var ball = Ball()
