@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>guario</title>
+</head>
+<body>
+<canvas id="id-canvas" width="640" height="640"></canvas>
+<script>
+    let e = sel => document.querySelector(sel)
+    let log = console.log.bind(console)
+
+    const ajax = request => {
+        let r = new XMLHttpRequest()
+        r.open(request.method, request.url, true)
+        r.responseType = 'arraybuffer'
+        r.onreadystatechange = event => {
+            if(r.readyState === 4) {
+                request.callback(r.response)
+            }
+        }
+        r.send()
+    }
+
+    const __main = () => {
+        let request = {
+            method: 'GET',
+            url: 'mario.nes',
+            callback(r) {
+                let bytes = new Uint8Array(r)
+                log('bytes', bytes)
+            }
+        }
+        ajax(request)
+    }
+    __main()
+</script>
+</body>
+</html>
