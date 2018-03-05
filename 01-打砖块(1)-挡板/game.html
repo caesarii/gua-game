@@ -27,13 +27,42 @@
         return img
     }
 
+    var Ball = function() {
+        var image = imageFromPath('ball.png')
+        var o = {
+            image: image,
+            x: 100,
+            y: 200,
+            speedX: 10,
+            speedY: 10,
+            fired: false,
+        }
+        o.fire = function() {
+            o.fired = true
+        }
+        o.move = function() {
+            if(o.fired) {
+                if(o.x < 0 || o.x > 400) {
+                    o.speedX = -o.speedX
+                }
+                if(o.y < 0 || o.y > 300) {
+                    o.speedY = -o.speedY
+                }
+                o.x += o.speedX
+                o.y += o.speedY
+            }
+        }
+
+        return o
+    }
+
     var Paddle = function() {
         var image = imageFromPath('paddle.png')
         var o = {
             image: image,
             x: 100,
-            y: 200,
-            speed: 5,
+            y: 250,
+            speed: 15,
         }
 
         o.moveLeft = function() {
@@ -42,6 +71,16 @@
 
         o.moveRight = function() {
             o.x += o.speed
+        }
+
+        o.collide = function(ball) {
+            const b = ball
+            if(b.y + b.image.height > o.y) {
+                if(b.x > o.x && b.x < o.x + o.image.width) {
+                    return true
+                }
+            }
+            return false
         }
 
         return o
@@ -102,6 +141,7 @@
     var __main = function() {
         var game = GuaGame()
         var paddle = Paddle()
+        var ball = Ball()
 
         game.registerAction('a', function() {
             paddle.moveLeft()
@@ -109,14 +149,21 @@
         game.registerAction('d', function() {
             paddle.moveRight()
         })
+        game.registerAction('f', function() {
+            ball.fire()
+        })
 
         game.update = function() {
-
+            ball.move()
+            if(paddle.collide(ball)) {
+                ball.speedY *= -1
+            }
         }
 
         game.draw = function() {
             // draw
             game.drawImage(paddle)
+            game.drawImage(ball)
         }
     }
 
