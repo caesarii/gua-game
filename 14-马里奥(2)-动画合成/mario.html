@@ -129,7 +129,16 @@
                 window.bytes = new Uint8Array(r)
                 log('bytes', bytes)
                 drawNes(bytes)
-                drawSprite(bytes.slice(32784))
+                let step = 0
+                let bytesPerblock = 16
+                let tilesPerSprite = 8
+                let bytesPerSprite = bytesPerblock * tilesPerSprite
+                setInterval(function() {
+                    let offset = tileOffset + step * bytesPerSprite
+                    drawSprite(bytes.slice(offset))
+                    step ++
+                    step %= 4
+                }, 200)
                 // let nes = String.fromCharCode(...bytes.slice(0, 4))
                 // log('nes', nes)
             }
