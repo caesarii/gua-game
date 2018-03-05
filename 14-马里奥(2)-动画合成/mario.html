@@ -10,6 +10,7 @@
 <body>
 <h3>offset</h3>
 <canvas id="id-canvas" width="640" height="640"></canvas>
+<canvas id="id-canvas-sprite" width="160" height="320"></canvas>
 <div class="gua-controls">
     <button data-offset="-1024" data-action="change_offset">-1024</button>
     <button data-offset="-16" data-action="change_offset">-16</button>
@@ -99,8 +100,28 @@
         })
     }
 
+    const drawSprite = data => {
+        let context = e('#id-canvas-sprite').getContext('2d')
+        let pixelsPerBlock = 8
+        let pixelWidth = 10
+        let blockSize = pixelsPerBlock * pixelWidth
+        let offset = 0
+        let x = 0
+        let y = 0
+        for(let i = 0; i < 4; i++) {
+            for(let j = 0; j < 2; j++) {
+                let x = j * blockSize
+                let y = i * blockSize
+                let pixels = data.slice(offset)
+                drawBlock(context, pixels, x, y, pixelWidth)
+                offset += 16
+            }
+        }
+    }
+
     const __main = () => {
         window.offset = 32784
+        let tileOffset = 32784
         let request = {
             method: 'GET',
             url: 'mario.nes',
@@ -108,8 +129,9 @@
                 window.bytes = new Uint8Array(r)
                 log('bytes', bytes)
                 drawNes(bytes)
-                let nes = String.fromCharCode(...bytes.slice(0, 4))
-                log('nes', nes)
+                drawSprite(bytes.slice(32784))
+                // let nes = String.fromCharCode(...bytes.slice(0, 4))
+                // log('nes', nes)
             }
         }
         ajax(request)
