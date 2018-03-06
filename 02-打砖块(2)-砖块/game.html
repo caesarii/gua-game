@@ -14,6 +14,7 @@
 </head>
 <body>
 <canvas id="id-canvas" width="400" height="300"></canvas>
+<script src="levels.js"></script>
 
 <script>
     var log = console.log.bind(console)
@@ -76,12 +77,15 @@
         return o
     }
 
-    var Block = function() {
+    var Block = function(position) {
+        // position 是 [0, 0] 格式
+        var p = position
+
         var image = imageFromPath('block.png')
         var o = {
             image: image,
-            x: 100,
-            y: 100,
+            x: p[0],
+            y: p[1],
             w: 50,
             h: 20,
             alive: true,
@@ -130,13 +134,12 @@
         return o
     }
 
-    var blocks = []
-    for(var i = 0; i < 3; i++) {
-        var b = Block()
-        b.x = i * 100 + 3
-        b.y = 50
-        blocks.push(b)
-    }
+    // for(var i = 0; i < 3; i++) {
+    //     var b = Block()
+    //     b.x = i * 100 + 3
+    //     b.y = 50
+    //     blocks.push(b)
+    // }
 
     var GuaGame = function() {
         var g = {
@@ -190,11 +193,23 @@
 
     }
 
+    var loadLevel = function(n) {
+        var blocks = []
+        n = n - 1
+        var level = levels[n]
+        for(var i = 0; i < level.length; i++) {
+            var p = level[i]
+            var b = Block(p)
+            blocks.push(b)
+        }
+        return blocks
+    }
+
+
     var __main = function() {
         var game = GuaGame()
         var paddle = Paddle()
         var ball = Ball()
-        var block = Block()
 
         var paused = false
         game.registerAction('a', function() {
@@ -206,9 +221,13 @@
         game.registerAction('f', function() {
             ball.fire()
         })
+        var blocks = loadLevel(1)
         window.addEventListener('keydown', function(event) {
-            if(event.key === 'p') {
+            var k = event.key
+            if(k === 'p') {
                 paused = !paused
+            } else if('1234567'.includes(k)) {
+                blocks = loadLevel(Number(k))
             }
         })
 
