@@ -14,6 +14,7 @@
 </head>
 <body>
 <canvas id="id-canvas" width="400" height="300"></canvas>
+<input type="range" id="id-input-speed" value="1">
 <script src="levels.js"></script>
 
 <script>
@@ -89,10 +90,14 @@
             w: 50,
             h: 20,
             alive: true,
+            lifes: p[2] || 1,
         }
 
         o.kill = function() {
-            o.alive = false
+            o.lifes --
+            if(o.lifes < 1) {
+                o.alive = false
+            }
         }
 
         o.collide = function(b) {
@@ -168,7 +173,8 @@
         }
         
         // timer
-        setInterval(function() {
+        var runloop = function()  {
+            // log('fps', fps)
             // events
             var actions = Object.keys(g.actions)
             for(var i = 0; i < actions.length; i++) {
@@ -188,7 +194,16 @@
 
             // draw
             g.draw()
-        }, 1000/30)
+            setTimeout(function() {
+                runloop()
+            }, 1000/window.fps)
+        }
+
+        log('fps', fps)
+        setTimeout(function() {
+            runloop()
+        }, 1000/window.fps)
+
         return g
 
     }
@@ -205,8 +220,33 @@
         return blocks
     }
 
+    var blocks = []
+
+    var enableDebugMode = function(enable) {
+        if(!enable) {
+            return
+        }
+        window.addEventListener('keydown', function(event) {
+            var k = event.key
+            if(k === 'p') {
+                // 暂停
+                paused = !paused
+            } else if('1234567'.includes(k)) {
+                blocks = loadLevel(Number(k))
+            }
+        })
+
+        // 控制速度
+        window.fps = 30
+        document.querySelector('#id-input-speed').addEventListener('input', function(event) {
+            var input = event.target
+            window.fps = Number(input.value)
+        })
+    }
 
     var __main = function() {
+        enableDebugMode(true)
+
         var game = GuaGame()
         var paddle = Paddle()
         var ball = Ball()
@@ -221,15 +261,7 @@
         game.registerAction('f', function() {
             ball.fire()
         })
-        var blocks = loadLevel(1)
-        window.addEventListener('keydown', function(event) {
-            var k = event.key
-            if(k === 'p') {
-                paused = !paused
-            } else if('1234567'.includes(k)) {
-                blocks = loadLevel(Number(k))
-            }
-        })
+        blocks = loadLevel(1)
 
         game.update = function() {
             if(paused) {
@@ -261,7 +293,6 @@
                     game.drawImage(block)
                 }
             }
-
         }
     }
 
