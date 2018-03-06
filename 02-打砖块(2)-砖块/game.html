@@ -35,7 +35,7 @@
         }
         return false
     }
-    
+
     var Paddle = function() {
         var image = imageFromPath('paddle.png')
         var o = {
@@ -133,7 +133,7 @@
     var blocks = []
     for(var i = 0; i < 3; i++) {
         var b = Block()
-        b.x = i * 100
+        b.x = i * 100 + 3
         b.y = 50
         blocks.push(b)
     }
@@ -196,6 +196,7 @@
         var ball = Ball()
         var block = Block()
 
+        var paused = false
         game.registerAction('a', function() {
             paddle.moveLeft()
         })
@@ -205,8 +206,16 @@
         game.registerAction('f', function() {
             ball.fire()
         })
+        window.addEventListener('keydown', function(event) {
+            if(event.key === 'p') {
+                paused = !paused
+            }
+        })
 
         game.update = function() {
+            if(paused) {
+                return
+            }
             ball.move()
             // 板与球相撞
             if(paddle.collide(ball)) {
